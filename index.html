@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Code Critical">
+<meta name="theme-color" content="#0a0e1a">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<title>Code Critical — MICA Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0e1a; --bg2:#111827; --bg3:#1a2235; --bg4:#232d42;
+  --accent:#00c896; --accent2:#0088ff; --accent3:#ff6b35;
+  --warn:#ffaa00; --danger:#ff4444;
+  --text:#f0f4ff; --text2:#8a99bb; --text3:#4a5568;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12);
+  --mono:'Space Mono',monospace; --sans:'DM Sans',sans-serif;
+  --safe-top:env(safe-area-inset-top); --safe-bot:env(safe-area-inset-bottom);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden}
+body{display:flex;flex-direction:column}
+
+.header{padding:calc(var(--safe-top) + 14px) 20px 14px;background:var(--bg);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.logo{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.08em;color:var(--accent)}
+.logo span{color:var(--text2)}
+.header-right{display:flex;gap:8px;align-items:center}
+.icon-btn{background:transparent;border:0.5px solid var(--border2);border-radius:8px;padding:5px 10px;color:var(--text2);cursor:pointer;font-size:10px;font-family:var(--mono);display:flex;align-items:center;gap:5px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--danger);flex-shrink:0}
+.status-dot.on{background:var(--accent)}
+
+.nav{display:flex;background:var(--bg);border-top:0.5px solid var(--border);padding-bottom:var(--safe-bot);flex-shrink:0}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:4px;border:none;background:transparent;cursor:pointer;color:var(--text3);transition:color 0.2s}
+.nav-btn.active{color:var(--accent)}
+.nav-label{font-size:10px;font-family:var(--mono);letter-spacing:0.04em}
+
+.screen{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;flex-direction:column}
+.screen.active{display:flex}
+
+.sect-head{padding:20px 20px 12px;flex-shrink:0}
+.sect-title{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;margin-bottom:4px}
+.sect-sub{font-size:13px;color:var(--text2);font-weight:300}
+
+.hscroll{display:flex;gap:8px;padding:0 16px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-shrink:0}
+.hscroll::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:7px 14px;border-radius:20px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-size:10px;font-family:var(--mono);cursor:pointer;white-space:nowrap;letter-spacing:0.04em;transition:all 0.2s}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#000;font-weight:700}
+.chip.active2{background:var(--accent2);border-color:var(--accent2);color:#fff;font-weight:700}
+
+.ep-card{margin:0 16px 12px;background:var(--bg2);border-radius:14px;border:0.5px solid var(--border);overflow:hidden;flex-shrink:0}
+.ep-top{padding:14px 16px 0;display:flex;justify-content:space-between;align-items:flex-start}
+.ep-num{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--accent2);background:rgba(0,136,255,0.1);padding:3px 8px;border-radius:10px}
+.ep-dur{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.ep-title{font-size:16px;font-weight:600;padding:8px 16px 4px;color:var(--text)}
+.ep-hook{font-size:12px;color:var(--text2);padding:0 16px 10px;line-height:1.55;font-style:italic;border-left:2px solid var(--accent);margin:0 16px 10px;padding-left:10px;border-radius:0}
+.cast{display:flex;gap:6px;padding:0 16px 10px;flex-wrap:wrap}
+.cp{font-size:9px;font-family:var(--mono);padding:3px 8px;border-radius:10px;letter-spacing:0.04em}
+.cp.host{background:rgba(100,80,255,0.15);color:#a78bfa;border:0.5px solid rgba(100,80,255,0.3)}
+.cp.expert{background:rgba(0,200,150,0.1);color:var(--accent);border:0.5px solid rgba(0,200,150,0.3)}
+.ep-tags{display:flex;gap:6px;padding:0 16px 14px;flex-wrap:wrap}
+.tag{font-size:9px;font-family:var(--mono);padding:3px 8px;border-radius:10px}
+.t-cpg{background:rgba(0,136,255,0.12);color:#60a5fa}
+.t-pharm{background:rgba(255,170,0,0.12);color:#fbbf24}
+.t-path{background:rgba(0,200,150,0.12);color:var(--accent)}
+.t-ecg{background:rgba(255,107,53,0.12);color:#fb923c}
+.play-row{padding:0 16px 16px}
+.play-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:10px;border:none;cursor:pointer;background:var(--accent);color:#000;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.06em;transition:opacity 0.2s}
+.play-btn:active{opacity:0.8}
+.tri{width:0;height:0;border-style:solid;border-width:5px 0 5px 9px;border-color:transparent transparent transparent currentColor}
+
+.player{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:0.5px solid var(--border2);padding:12px 20px calc(var(--safe-bot) + 62px);transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);z-index:100}
+.player.visible{transform:translateY(0)}
+.player-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-ep{font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:10px}
+.prog-bar{height:3px;background:var(--bg4);border-radius:2px;margin-bottom:10px;overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.5s linear;width:0%}
+.player-ctrls{display:flex;align-items:center;justify-content:space-between}
+.ctrl{background:transparent;border:none;cursor:pointer;color:var(--text2);padding:6px;border-radius:8px;transition:color 0.15s;font-family:var(--mono);font-size:11px}
+.ctrl:active{color:var(--text)}
+.ctrl.main{width:44px;height:44px;background:var(--accent);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.ctrl.main:active{opacity:0.8}
+.gen-text{font-size:11px;color:var(--accent);font-family:var(--mono);text-align:center;padding:3px 0;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.3}50%{opacity:1}}
+
+.quiz-wrap{padding:16px;display:flex;flex-direction:column;gap:12px;flex-shrink:0}
+.q-meta{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.q-pb{flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.q-pf{height:100%;background:var(--accent2);border-radius:2px;transition:width 0.3s}
+.q-sc{font-family:var(--mono);font-size:11px;color:var(--accent);white-space:nowrap}
+.q-card{background:var(--bg2);border-radius:14px;border:0.5px solid var(--border);padding:16px}
+.q-ref{font-size:9px;font-family:var(--mono);padding:3px 8px;border-radius:10px;display:inline-block;margin-bottom:10px;letter-spacing:0.06em}
+.q-text{font-size:15px;font-weight:500;color:var(--text);line-height:1.5;margin-bottom:14px}
+.q-opts{display:flex;flex-direction:column;gap:8px}
+.q-opt{text-align:left;font-size:13px;padding:13px 16px;border-radius:10px;cursor:pointer;background:var(--bg3);border:0.5px solid var(--border2);color:var(--text);line-height:1.4;transition:all 0.15s;font-family:var(--sans)}
+.q-opt:active:not(:disabled){transform:scale(0.98)}
+.q-opt.correct{background:rgba(0,200,150,0.15);border-color:var(--accent);color:#6ee7b7}
+.q-opt.wrong{background:rgba(255,68,68,0.12);border-color:var(--danger);color:#fca5a5}
+.q-opt.reveal{background:rgba(0,200,150,0.1);border-color:rgba(0,200,150,0.4);color:#6ee7b7}
+.q-expl{font-size:12px;color:var(--text2);line-height:1.6;padding:12px;background:var(--bg3);border-radius:10px;border-left:2px solid var(--accent2)}
+.q-ref-lbl{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:6px}
+.next-btn{padding:13px;border-radius:10px;border:0.5px solid var(--border2);background:var(--bg3);color:var(--text2);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.06em;cursor:pointer}
+.next-btn:active{background:var(--bg4)}
+
+.res-wrap{padding:16px;flex-shrink:0}
+.res-card{background:var(--bg2);border-radius:14px;border:0.5px solid var(--border);padding:24px;text-align:center}
+.res-score{font-family:var(--mono);font-size:52px;font-weight:700;color:var(--accent);line-height:1}
+.res-denom{font-family:var(--mono);font-size:20px;color:var(--text3)}
+.res-pct{font-size:12px;color:var(--text2);margin:6px 0 16px;font-family:var(--mono);letter-spacing:0.08em}
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.rg{background:var(--bg3);border-radius:10px;padding:10px}
+.rg-v{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--text)}
+.rg-l{font-size:10px;color:var(--text3);margin-top:2px;font-family:var(--mono)}
+.res-msg{font-size:13px;color:var(--text2);line-height:1.6;background:var(--bg3);padding:12px;border-radius:10px;text-align:left;margin-bottom:14px}
+.res-btns{display:flex;gap:8px}
+.res-btns button{flex:1;padding:12px;border-radius:10px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-family:var(--mono);font-size:10px;letter-spacing:0.06em;cursor:pointer}
+.res-btns .pri{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
+
+.prog-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 16px 12px;flex-shrink:0}
+.pc{background:var(--bg2);border-radius:12px;padding:14px;border:0.5px solid var(--border)}
+.pc-val{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--accent)}
+.pc-lbl{font-size:11px;color:var(--text3);margin-top:3px;font-family:var(--mono)}
+.dots-wrap{display:flex;gap:4px;flex-wrap:wrap;padding:0 16px 12px;flex-shrink:0}
+.dot{width:22px;height:22px;border-radius:50%;background:var(--bg4);flex-shrink:0;transition:background 0.3s}
+.dot.done{background:var(--accent)}.dot.today{background:var(--accent2)}
+.weak-card{margin:0 16px 12px;background:var(--bg2);border-radius:14px;border:0.5px solid var(--border);padding:16px;flex-shrink:0}
+.weak-ttl{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;margin-bottom:12px}
+.weak-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)}
+.weak-row:last-child{border-bottom:none}
+.weak-name{font-size:12px;color:var(--text2);flex:1}
+.weak-pct{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--danger);min-width:36px;text-align:right}
+.weak-bar{width:48px;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.weak-fill{height:100%;background:var(--danger);border-radius:2px}
+.drill-btn{margin:0 16px 16px;padding:14px;border-radius:10px;border:0.5px solid var(--accent);background:transparent;color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:0.06em;font-weight:700;cursor:pointer;width:calc(100% - 32px);flex-shrink:0}
+.sync-badge{font-size:10px;font-family:var(--mono);color:var(--text3);text-align:center;padding:0 16px 12px;flex-shrink:0}
+.sync-badge span{color:var(--accent)}
+
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:flex-end;z-index:200;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border-radius:20px 20px 0 0;padding:20px 20px calc(var(--safe-bot) + 20px);width:100%;border-top:0.5px solid var(--border2);transform:translateY(40px);transition:transform 0.3s}
+.modal-bg.open .modal{transform:translateY(0)}
+.modal-ttl{font-family:var(--mono);font-size:12px;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;margin-bottom:6px}
+.modal-sub{font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5}
+.modal input{width:100%;padding:13px 14px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;margin-bottom:10px}
+.modal input:focus{border-color:var(--accent)}
+.modal input::placeholder{color:var(--text3)}
+.modal-btns{display:flex;gap:8px}
+.modal-btns button{flex:1;padding:13px;border-radius:10px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-family:var(--mono);font-size:11px;letter-spacing:0.06em;cursor:pointer}
+.modal-btns .save{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
+.modal-note{font-size:11px;color:var(--text3);line-height:1.5;margin-top:10px}
+.modal-section{margin-top:16px;padding-top:16px;border-top:0.5px solid var(--border)}
+
+.toast{position:fixed;bottom:calc(var(--safe-bot) + 80px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;padding:10px 18px;font-family:var(--mono);font-size:11px;color:var(--text);opacity:0;transition:all 0.3s;z-index:300;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{padding:40px 20px;text-align:center;color:var(--text3)}
+.empty-icon{font-size:36px;margin-bottom:12px;opacity:0.4}
+.empty-text{font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">CODE<span>CRITICAL</span></div>
+  <div class="header-right">
+    <button class="icon-btn" id="sync-btn" onclick="openSettings('supabase')">
+      <div class="status-dot" id="sb-dot"></div>
+      <span id="sb-lbl">SYNC</span>
+    </button>
+    <button class="icon-btn" onclick="openSettings('anthropic')">
+      <div class="status-dot" id="api-dot"></div>
+      <span id="api-lbl">API</span>
+    </button>
+  </div>
+</div>
+
+<!-- PODCAST -->
+<div class="screen active" id="screen-podcast">
+  <div class="sect-head">
+    <div class="sect-title">Podcast</div>
+    <div class="sect-sub">Nick McDonald &amp; Paul Rogers · Michael Walker</div>
+  </div>
+  <div class="hscroll" id="week-scroll"></div>
+  <div id="ep-list"></div>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="screen-quiz">
+  <div class="sect-head">
+    <div class="sect-title">Daily Quiz</div>
+    <div class="sect-sub">10 questions · instant feedback</div>
+  </div>
+  <div class="hscroll" id="topic-scroll"></div>
+  <div class="quiz-wrap" id="quiz-area"></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="screen" id="screen-progress">
+  <div class="sect-head">
+    <div class="sect-title">Progress</div>
+    <div class="sect-sub">Your MICA study tracker</div>
+  </div>
+  <div class="prog-grid">
+    <div class="pc"><div class="pc-val" id="p-streak">0</div><div class="pc-lbl">Day streak</div></div>
+    <div class="pc"><div class="pc-val" id="p-quiz">0</div><div class="pc-lbl">Quizzes done</div></div>
+    <div class="pc"><div class="pc-val" id="p-acc">—</div><div class="pc-lbl">Accuracy</div></div>
+    <div class="pc"><div class="pc-val" id="p-eps">0</div><div class="pc-lbl">Episodes</div></div>
+  </div>
+  <div style="padding:0 16px 8px;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text3);flex-shrink:0">LAST 30 DAYS</div>
+  <div class="dots-wrap" id="dots"></div>
+  <div class="weak-card">
+    <div class="weak-ttl">Areas needing work</div>
+    <div id="weak-list"></div>
+  </div>
+  <button class="drill-btn" onclick="drillWeak()">DRILL WEAK AREAS →</button>
+  <div class="sync-badge" id="sync-info">Progress syncs across all your devices</div>
+</div>
+
+<!-- PLAYER -->
+<div class="player" id="player">
+  <div class="player-title" id="p-title">—</div>
+  <div class="player-ep" id="p-ep">Code Critical</div>
+  <div class="prog-bar"><div class="prog-fill" id="p-fill"></div></div>
+  <div id="p-gen" class="gen-text" style="display:none">GENERATING EPISODE...</div>
+  <div class="player-ctrls">
+    <button class="ctrl" onclick="changeSpeed()" id="speed-btn" style="min-width:38px">1×</button>
+    <button class="ctrl" onclick="skipBack()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-5"/></svg>
+    </button>
+    <button class="ctrl main" onclick="togglePlay()">
+      <svg id="pp-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+    </button>
+    <button class="ctrl" onclick="skipFwd()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.49-5"/></svg>
+    </button>
+    <button class="ctrl" onclick="closePlayer()" style="font-size:20px;color:var(--text3)">×</button>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showScreen('podcast',this)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    <span class="nav-label">PODCAST</span>
+  </button>
+  <button class="nav-btn" onclick="showScreen('quiz',this)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span class="nav-label">QUIZ</span>
+  </button>
+  <button class="nav-btn" onclick="showScreen('progress',this)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span class="nav-label">PROGRESS</span>
+  </button>
+</nav>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-bg" id="modal" onclick="closeModalBg(event)">
+  <div class="modal">
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────────────────
+
+var WEEKS = [
+  {n:'W1',label:'Cardiac Arrest'},{n:'W2',label:'ECG Fundamentals'},
+  {n:'W3',label:'ACS & STEMI'},{n:'W4',label:'Dysrhythmias'},
+  {n:'W5',label:'Respiratory'},{n:'W6',label:'Airway & RSI'},
+  {n:'W7',label:'Neuro & Metabolic'},{n:'W8',label:'Tox & Pain'},
+  {n:'W9',label:'Major Trauma'},{n:'W10',label:'Environment'},
+  {n:'W11',label:'Obstetrics'},{n:'W12',label:'Paediatrics'},
+  {n:'W13',label:'Advanced ECG'},{n:'W14',label:'Pharmacology'},
+  {n:'W15',label:'Shock'},{n:'W16',label:'OSCE Prep'}
+];
+
+var EPISODES = {
+  W1:[
+    {id:'ep01',num:'EP 01',title:'The 4am Collapse',dur:'35 min',
+     hook:"It's 4am. A woman calls 000. Her husband is on the kitchen floor, not breathing. Nick and Paul are eight minutes out.",
+     tags:['t-cpg','t-path','t-pharm'],tl:['CPG A0201–A0203','Cardiac arrest patho','Adrenaline & amiodarone'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 01: The 4am Collapse.\n\nHOSTS: Nick McDonald (senior MICA paramedic, 8 years experience) and Paul Rogers (experienced ALS paramedic applying for MICA). Nick is the experienced voice; Paul asks questions that reveal the teaching and occasionally gets things wrong.\n\nCLINICAL EXPERT: Michael Walker — emergency physician and intensivist, joins mid-episode.\n\nFORMAT — blend all three styles:\n1. Nick and Paul conversational — disagreements, Paul asking questions, Nick drawing on experience\n2. Case narrative — open with the scene in real time at dispatch, return at key decision points\n3. Expert interview — Nick calls in Michael Walker, Paul questions him\n\nCONTENT:\n- Open: 4am dispatch, arrival, primary survey, first rhythm check\n- Pathophysiology of VF, PEA and asystole at cellular level — Michael explains each mechanism in depth\n- AV CPG A0201: defibrillation 200J biphasic, CPR cycles, adrenaline 1mg IV every 4 min (alpha-1 vasoconstriction mechanism, coronary perfusion pressure), amiodarone 300mg after 3rd shock (multi-channel blockade mechanism)\n- CPG A0202 ROSC: SpO2 94-98% (hyperoxia causes free radical reperfusion injury — explain mechanism in depth), ETCO2 35-40, BP targets, 12-lead for re-occlusion\n- CPG A0203: Nick and Paul debate a genuinely difficult case — 78yo, unwitnessed arrest, asystole 40 min in, family begging them to continue\n- Close: what they would do differently\n\nWrite as a full transcript. Natural speech. Interruptions. Real clinical debate. This is a podcast, not a lecture.'},
+    {id:'ep02',num:'EP 02',title:"When ROSC Isn't the End",dur:'32 min',
+     hook:"Pulses back after 22 minutes. GCS 5. Barely breathing. 35 minutes from tertiary centre.",
+     tags:['t-cpg','t-path','t-pharm'],tl:['CPG A0202 ROSC','Post-arrest syndrome','CPG A0203'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 02: When ROSC Isn\'t the End.\n\nHOSTS: Nick McDonald and Paul Rogers. EXPERT: Michael Walker (emergency physician and intensivist).\n\nCONTENT: Continue from EP01 — ROSC after 22 minutes, GCS 5, SpO2 92%, BP 80/50, 35 min from tertiary centre.\n- Post-cardiac arrest syndrome pathophysiology: brain injury, myocardial stunning, systemic ischaemia-reperfusion — Michael explains each mechanism\n- CPG A0202 in full: SpO2 94-98% (NOT 100% — free radical generation in reperfusion), ETCO2 35-40, BP targets, 12-lead for re-occlusion\n- CPG A0203 hard case: 78yo unwitnessed arrest, asystole 40 min, family begging them to continue — full ethical and clinical debate\n- Michael\'s parting advice: what matters most in the first hour post-ROSC\n\nFull transcript. Let Paul push back hard on ceasing resuscitation.'}
+  ],
+  W2:[
+    {id:'ep03',num:'EP 03',title:"The Heart's Electrical Wiring",dur:'38 min',
+     hook:"71-year-old man. HR 38. P waves everywhere, QRS complexes minding their own business.",
+     tags:['t-ecg','t-path'],tl:['Conduction anatomy','Heart blocks 1°–3°','BBB recognition'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 03: The Heart\'s Electrical Wiring.\n\nHOSTS: Nick McDonald and Paul Rogers. EXPERT: Michael Walker (cardiologist and electrophysiologist).\n\nCASE: 71yo male, near-syncope, HR 38, complete heart block. Paul reads the ECG and gets it partially wrong — this drives the teaching.\n\nCONTENT:\n- Cardiac conduction system: SA node, AV node, Bundle of His, bundle branches, Purkinje fibres — Michael explains why damage at each level produces a different ECG\n- Systematic ECG reading: rate, rhythm, axis, P waves, PR interval, QRS, ST, T waves\n- First degree heart block: significance, do you treat it?\n- Second degree Mobitz I: PR lengthening, dropped beat — Paul tries to explain, gets it wrong, Nick and Michael correct\n- Second degree Mobitz II: sudden dropped beats, why more sinister\n- Third degree complete heart block: AV dissociation — Nick and Paul examine the trace beat by beat\n- RBBB vs LBBB: Paul identifies one incorrectly — learning moment\n- Symptomatic bradycardia: atropine (only nodal blocks) vs transcutaneous pacing\n\nFull transcript. Paul\'s mistakes are the teaching vehicle.'}
+  ],
+  W3:[
+    {id:'ep04',num:'EP 04',title:"The Chest Pain That Wasn't",dur:'40 min',
+     hook:"52-year-old woman. Jaw ache. Nausea. Paul almost clears the case. Her ECG changes everything.",
+     tags:['t-ecg','t-cpg','t-pharm'],tl:['STEMI recognition','ACS CPG','Aspirin/GTN/heparin'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 04: The Chest Pain That Wasn\'t.\n\nHOSTS: Nick McDonald and Paul Rogers. EXPERT: Michael Walker (interventional cardiologist).\n\nCASE: 52yo woman, jaw ache, diaphoresis, dismissed by GP twice. Paul anchors to anxiety. Nick suspicious. ECG shows inferior STEMI.\n\nCONTENT:\n- Paul\'s anchoring bias drives the first half — he nearly clears the case\n- Atypical STEMI: why women, diabetics, elderly don\'t present classically — referred pain pathophysiology\n- 12-lead: inferior STEMI II, III, aVF — Nick spots it, talks Paul through it\n- Plaque rupture pathophysiology: Michael explains atherosclerosis, vulnerable plaque, acute coronary occlusion at cellular level\n- Reciprocal changes: mechanism and confirmation of territory\n- Full ACS CPG: aspirin (irreversible COX-1 inhibition, 300mg), GTN (mechanism, contraindications: RV MI, hypotension, PDE-5 inhibitors), heparin (antithrombin III mechanism)\n- Michael describes cath lab findings — total RCA occlusion\n- Cognitive bias debrief: what Paul would do differently\n\nFull transcript. Paul\'s anchoring bias is the clinical error driving the episode.'},
+    {id:'ep05',num:'EP 05',title:'The ECG That Hides in Plain Sight',dur:'35 min',
+     hook:"The ECG looks almost normal. Paul is ready to clear the case. Nick keeps staring at the monitor.",
+     tags:['t-ecg','t-path'],tl:['Posterior MI','RV MI','Wellens & de Winter'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 05: The ECG That Hides in Plain Sight.\n\nHOSTS: Nick McDonald and Paul Rogers. EXPERT: Michael Walker (emergency physician, ECG specialist).\n\nCASE: Chest pain, 12-lead underwhelming — ST depression V1-V4, tall R in V1. Paul wants to clear it. Nick won\'t.\n\nCONTENT:\n- Posterior MI: reciprocal changes in V1-V4, posterior leads V7-V9 technique\n- RV MI: right-sided leads V4R, the GTN trap — Nick recalls giving GTN and the patient crashing\n- Wellens syndrome: Type A (biphasic T V2-V3) vs Type B (deep symmetric inversions) — critical LAD stenosis, never stress test\n- de Winter T waves: upsloping ST depression + tall peaked T waves V1-V6 — STEMI equivalent\n- LBBB as STEMI equivalent: Sgarbossa criteria — Paul applies them with Michael coaching\n\nFull transcript. Nick\'s experience vs Paul\'s pattern-matching — the tension is the pedagogy.'}
+  ],
+  W4:[
+    {id:'ep06',num:'EP 06',title:'Three Patients, One Shift',dur:'40 min',
+     hook:"SVT. AF with RVR. VT with a pulse. Three rhythms, three treatments — and Paul nearly cardioverts the wrong one.",
+     tags:['t-ecg','t-cpg','t-pharm'],tl:['SVT/AF/VT management','Adenosine/amiodarone','Cardioversion decisions'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 06: Three Patients, One Shift.\n\nHOSTS: Nick McDonald and Paul Rogers. EXPERT: Michael Walker (cardiologist and electrophysiologist).\n\nThree cases, one night shift. Paul nearly makes a dangerous error in Case 2.\n\nCase 1 — SVT: 28yo woman, HR 190, narrow complex, regular. Adenosine — Michael explains re-entrant circuits, why technique matters.\n\nCase 2 — AF with RVR: 65yo on digoxin, HR 148, BP 92/58. Paul reaches for defibrillator. Nick stops him. The AF duration question, thrombus risk. Rate vs rhythm control. Metoprolol mechanism. Digoxin toxicity on ECG.\n\nCase 3 — VT with pulse: 54yo post-MI, HR 162, wide complex. Paul calls SVT with aberrancy. Nick finds AV dissociation, fusion beats, capture beats. Michael: when in doubt, treat as VT. Amiodarone mechanism.\n\nFull transcript. Paul nearly makes a dangerous error in Case 2.'}
+  ],
+  W5:[
+    {id:'ep07',num:'EP 07',title:'Drowning in Air',dur:'38 min',
+     hook:"Life-threatening asthma. Then: is the next patient APO or asthma? Getting it wrong is fatal.",
+     tags:['t-cpg','t-pharm','t-path'],tl:['CPG A0601','MgSO4/frusemide/CPAP','ETCO2 in resp failure'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 07: Drowning in Air.\n\nHOSTS: Nick McDonald (leads Case 1) and Paul Rogers (leads Case 2). EXPERT: Michael Walker (respiratory physician and intensivist).\n\nCase 1 — severe asthma: 19yo, silent chest, SpO2 85%. Dynamic hyperinflation and auto-PEEP pathophysiology. CPG A0601: salbutamol, ipratropium, adrenaline nebulised, dexamethasone (steroid mechanism), IV MgSO4 (calcium antagonism on smooth muscle, 2.5g over 20 min). RSI risks. Michael: why dynamic hyperinflation kills intubated asthmatics, I:E ratio, permissive hypercapnia.\n\nCase 2 — diagnostic challenge: 80yo, bilateral wheeze, history of COPD AND CCF. Paul leads and gets the initial diagnosis wrong. How to differentiate: ETCO2 patterns, work of breathing, fluid overload signs. APO management: GTN titration, frusemide (venodilation then diuresis), CPAP mechanics.\n\nFull transcript. Paul is wrong initially in Case 2.'}
+  ],
+  W6:[
+    {id:'ep08',num:'EP 08',title:'One Shot at the Airway',dur:'40 min',
+     hook:"Blood everywhere. GCS 7 and falling. Predicted difficult airway. Paul is first attendant.",
+     tags:['t-cpg','t-pharm'],tl:['CPG A0302 RSI','Ketamine/sux/rocuronium','Surgical airway'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 08: One Shot at the Airway.\n\nHOSTS: Nick McDonald and Paul Rogers. EXPERT: Michael Walker (consultant anaesthetist and retrieval physician).\n\nCASE: Major facial trauma, blood in airway, GCS 7 and falling. Paul is first attendant. Nick supervises.\n\nCONTENT:\n- Pre-RSI: LEMON criteria — Paul does it out loud with Michael coaching\n- RSI sequence: preparation, preoxygenation (NODESAT), induction, paralysis, intubation, confirmation, post-intubation care — Michael gives rationale for each step\n- Induction: ketamine vs midazolam — mechanisms. Michael defends ketamine for trauma; Paul pushes back.\n- Paralytic: suxamethonium vs rocuronium — mechanisms, contraindications to sux, sugammadex reversal\n- Paul intubates — confirmed with waveform ETCO2\n- Failed airway: FONA — surgical cricothyroidotomy. Nick has done one. He describes it honestly.\n- Post-intubation: ventilator settings (TV 6-8ml/kg, RR 10-12, PEEP 5), sedation infusion\n\nFull transcript. Paul\'s anxiety is real and instructive.'}
+  ],
+  W7:[
+    {id:'ep09',num:'EP 09',title:'The Brain Emergency',dur:'38 min',
+     hook:"Stroke? Seizure? Metabolic? The 68-year-old can't talk and is getting worse. Nick and Paul can't agree.",
+     tags:['t-cpg','t-pharm','t-path'],tl:['CPG A0711/A0703/A0702','Stroke vs seizure patho','Diazepam/midazolam/dextrose'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 09: The Brain Emergency.\n\nHOSTS: Nick McDonald and Paul Rogers. EXPERT: Michael Walker (neurologist and stroke physician).\n\nCASE: 68yo male, GCS 9, facial droop, history of epilepsy AND diabetes. Paul says stroke. Nick says postictal or metabolic.\n\nCONTENT:\n- BSL first: 1.8 mmol/L. Hypoglycaemia pathophysiology and neuroglycopaenia. CPG A0702: dextrose 10% (mechanism, dose), dextrose 50%, glucagon (hepatic glycogenolysis)\n- BSL corrects but patient doesn\'t improve fully. Now what?\n- Stroke: ACTFAST/MASS. Michael explains ischaemic vs haemorrhagic pathophysiology, why you can\'t distinguish clinically, thrombolysis criteria\n- Patient seizes. CPG A0703: diazepam (GABA-A agonist, dose, routes), midazolam (IM/IN/IV, dose), refractory status and RSI\n- Meningococcal: ceftriaxone mechanism and dose\n\nFull transcript. Diagnosis changes three times. Both hosts partially wrong at different points.'}
+  ],
+  W8:[
+    {id:'ep10',num:'EP 10',title:'The Chemistry Set',dur:'40 min',
+     hook:"Anaphylaxis. An OD that doesn't respond to naloxone. TCA toxicity. An organophosphate that nearly takes Nick and Paul down too.",
+     tags:['t-cpg','t-pharm','t-path'],tl:['Anaphylaxis cascade','Naloxone/atropine/NaHCO3','Overdose CPG A0707'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 10: The Chemistry Set.\n\nHOSTS: Nick McDonald and Paul Rogers. EXPERT: Michael Walker (toxicologist and emergency physician).\n\nFour toxicological cases in one shift. Paul nearly makes a dangerous drug error in Case 3.\n\nCase 1 — Anaphylaxis: bee sting, patient collapses. Pathophysiology: IgE-mediated mast cell degranulation, histamine/leukotrienes/bradykinin. Biphasic reactions. CPG A0704: adrenaline IM (lateral thigh, 0.5mg 1:1000 — why the thigh), IV adrenaline escalation, hydrocortisone, promethazine.\n\nCase 2 — Opioid OD: 24yo, pinpoint pupils, RR 4. Naloxone mechanism, dose, re-narcotisation trap.\n\nMichael joins: why naloxone wears off before fentanyl. TCA overdose: sodium channel blockade, wide QRS, R wave aVR, sodium bicarbonate mechanism.\n\nCase 3 — TCA overdose: Paul calculates the wrong dose — Nick catches it.\n\nCase 4 — Organophosphate: farmer, SLUDGE, miosis, bronchospasm. Mechanism: irreversible AChE inhibition. Atropine — titrate to DRY secretions not HR. Pralidoxime and ageing. Crew contamination risk.\n\nFull transcript. Near-miss in Case 3. Real contamination concern in Case 4.'}
+  ],
+  W9:[
+    {id:'ep11',num:'EP 11',title:'The Road Toll',dur:'40 min',
+     hook:"High-speed MVA. Uncontrolled haemorrhage. Blown pupil. Tension pneumo building while Nick works the TBI. Paul is managing two patients alone.",
+     tags:['t-cpg','t-pharm','t-path'],tl:['CPG A0801–A0803','TXA/permissive hypotension','TBI & tension PTX'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 11: The Road Toll.\n\nHOSTS: Nick McDonald and Paul Rogers. EXPERT: Michael Walker (trauma surgeon and retrieval physician).\n\nCASE: High-speed MVA, three patients. Most critical: ejected driver, femoral laceration, GCS 6, absent left breath sounds, tracheal deviation. Nick leads. Paul manages a second patient alone.\n\nCONTENT:\n- Haemorrhagic shock: four stages, physiological compensations, lethal triad (acidosis, hypothermia, coagulopathy)\n- CPG A0801: permissive hypotension (SBP 80-90 penetrating, not in TBI), TXA (antifibrinolytic mechanism, CRASH-2, 3-hour window, 1g IV over 10 min). Michael defends permissive hypotension — Paul uncomfortable.\n- CPG A0803 TBI: GCS 6, blown pupil. RSI. Ventilation: normocapnia ETCO2 35-40, brief hyperventilation only for active herniation. SpO2 94-98%.\n- CPG A0802 tension PTX: finger thoracostomy — Nick explains technique, Michael walks through anatomy. Why preferred over needle in intubated patient.\n- Paul\'s second patient deteriorates in the background.\n\nFull transcript. Real resource constraint. Three problems simultaneously.'}
+  ],
+  W11:[
+    {id:'ep13',num:'EP 13',title:'The Worst Shift',dur:'40 min',
+     hook:"Eclampsia in a lift. A uterus that won't contract. Shoulder dystocia with the clock ticking.",
+     tags:['t-cpg','t-pharm','t-path'],tl:['Pre-eclampsia/eclampsia','MgSO4/oxytocin pharmacology','PPH/shoulder dystocia'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 13: The Worst Shift.\n\nHOSTS: Nick McDonald and Paul Rogers. EXPERTS: Michael Walker (obstetrician) and Midwife Elena Kovacs (retrieval midwife).\n\nThree obstetric cases:\n\nCase 1 — Eclampsia: primigravida 34 weeks, BP 196/122, seizing in lift. Pre-eclampsia pathophysiology: abnormal placentation, endothelial dysfunction, cerebral vasospasm, PRES. MgSO4: NMDA receptor blockade AND cerebral vasodilation, loading dose 4g IV over 5-10 min, toxicity signs (patellar reflexes first), antidote calcium gluconate. Hydralazine for severe hypertension.\n\nCase 2 — PPH: home birth, massive PPH, soft uterus. 4Ts framework. Oxytocin (mechanism, dose, route), ergometrine (mechanism, contraindication in hypertension — Paul notices the contrast with Case 1). Haemodynamic resuscitation.\n\nCase 3 — Shoulder dystocia: Elena coaches Nick through HELPERR in real time. McRoberts, suprapubic pressure, all-fours. Time pressure — fetal hypoxia window.\n\nFull transcript. Paul\'s stress is real. Elena is authoritative and calm.'}
+  ],
+  W12:[
+    {id:'ep14',num:'EP 14',title:'Small Patients, Big Problems',dur:'38 min',
+     hook:"2-year-old in arrest. 7-year-old anaphylaxis. 14-year-old with stridor getting worse.",
+     tags:['t-cpg','t-pharm','t-path'],tl:['Paeds physiology','Weight-based dosing/IO','PIPER activation'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 14: Small Patients, Big Problems.\n\nHOSTS: Nick McDonald and Paul Rogers. EXPERT: Michael Walker (paediatric emergency physician and PIPER consultant).\n\nPaul is visibly anxious about paediatric cases.\n\nCase 1 — Paeds arrest: 2yo unresponsive. Why paeds arrest differs: respiratory before cardiac, asphyxial predominance. Physiological differences: HR/RR/BP norms, head size. Weight: APLS formula. Paul calculates adrenaline 0.01mg/kg for a 12kg child. IO access: sites, technique, medications via IO. PIPER criteria.\n\nCase 2 — Paeds anaphylaxis: 7yo, peanut exposure. Paul doesn\'t have the weight. Nick: "APLS formula — go." Adrenaline IM dose, lateral thigh. Salbutamol. Fluid 10-20ml/kg.\n\nCase 3 — Stridor: 14yo, progressive stridor, high fever, drooling, won\'t lie flat. Paul wants to examine the throat. Nick stops him firmly. Croup vs epiglottitis vs foreign body — differentiation. NEVER examine throat in epiglottitis. Nebulised adrenaline, dexamethasone, "don\'t agitate."\n\nFull transcript. Paul wanting to examine the throat in Case 3 is the major teaching moment.'}
+  ],
+  W13:[
+    {id:'ep15',num:'EP 15',title:'The ECG That Lies',dur:'40 min',
+     hook:"Hyperkalaemia to a sine wave. Brugada that looks like RBBB. Long QT from a drug Nick gave.",
+     tags:['t-ecg','t-pharm','t-path'],tl:['Hyperkalemia ECG progression','Brugada/long QT','PE & pericarditis'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 15: The ECG That Lies.\n\nHOSTS: Nick McDonald and Paul Rogers. EXPERT: Michael Walker (electrophysiologist).\n\nFour advanced ECG cases. Two caught, two nearly missed. Nick owns an error in Case 4.\n\nCase 1 — Hyperkalaemia: dialysis patient, peaked T waves, widening QRS. Michael: full ECG progression — normal → peaked T → prolonged PR → widened QRS → absent P → sine wave → VF. Mechanism: K+ effects on resting membrane potential. MICA management: calcium gluconate (membrane stabilisation NOT lowering K+), then salbutamol and insulin/dextrose.\n\nCase 2 — Brugada: 35yo, prior unexplained syncope, coved ST elevation V1-V2. Paul calls RBBB. Michael corrects. SCN5A mutation, VF risk.\n\nCase 3 — Pericarditis vs STEMI: 22yo, pleuritic chest pain, fever, diffuse saddle-shaped ST elevation. Paul activates cath lab. Nick uncertain. Diffuse vs territorial, PR depression (pathognomonic of pericarditis), no reciprocal changes.\n\nCase 4 — Drug-induced long QT: Nick gave ondansetron to a patient on azithromycin. QTc > 510ms. Torsades. Nick owns it honestly. QT-prolonging classes. MgSO4 2g IV mechanism.\n\nFull transcript. Nick\'s honesty in Case 4 is a model of professional practice.'}
+  ],
+  W14:[
+    {id:'ep16',num:'EP 16',title:'The Pharmacology Masterclass',dur:'40 min',
+     hook:"You've given the drug. Now — what is it actually doing? Vasopressors, infusions, and the interactions that turn your treatment into the problem.",
+     tags:['t-pharm','t-path'],tl:['Vasopressors & receptor pharmacology','Drug interactions','Post-intubation sedation'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 16: The Pharmacology Masterclass.\n\nHOSTS: Nick McDonald and Paul Rogers. EXPERT: Michael Walker (clinical pharmacologist and intensivist).\n\nCASE ANCHOR: 66yo post-STEMI, BP 70/42 despite 500mL fluid, HR 112. Paul picks up adrenaline. Nick: "Wait — walk me through your rationale."\n\nCONTENT:\n- Receptor pharmacology: Michael explains alpha-1, alpha-2, beta-1, beta-2, dopaminergic. Nick maps each MICA drug to receptor profile in real time.\n- Vasopressor breakdown: adrenaline (full agonist, dose-dependent shift, arrhythmogenicity), noradrenaline (predominantly alpha-1, modest beta-1), metaraminol (indirect alpha agonist), vasopressin (V1 receptor, catecholamine-resistant shock). Nick and Michael debate noradrenaline vs adrenaline in cardiogenic shock.\n- Calcium gluconate and MgSO4: why the same drug has three different mechanisms in asthma, eclampsia and torsades.\n- Drug interactions: MAOIs + opioids (serotonin syndrome), beta-blockers + salbutamol, digoxin toxicity triggers, QT-prolonging combinations.\n- Post-intubation sedation: ketamine/midazolam combination rationale, dose targets, awareness monitoring.\n\nFull transcript. Michael is the most intellectually rigorous guest of the series.'}
+  ],
+  W15:[
+    {id:'ep17',num:'EP 17',title:'Pick a Shock',dur:'40 min',
+     hook:"BP 72/40. HR 122. Four possible causes. Four completely different treatments. The diagnosis changes three times.",
+     tags:['t-cpg','t-pharm','t-path','t-ecg'],tl:['Shock differential diagnosis','Vasopressor selection','Sepsis & distributive shock'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 17: Pick a Shock.\n\nHOSTS: Nick McDonald and Paul Rogers. EXPERT: Michael Walker (intensive care physician).\n\nCASE: 58yo male, BP 72/40, HR 122. Diagnosis changes three times. Both Nick and Paul are wrong at some point.\n\nCONTENT:\n- Patient initially hot and flushed — Paul says sepsis. Then distended neck veins and absent left breath sounds. Nick: "That\'s not sepsis."\n- Shock classification with Michael:\n  * Hypovolaemic: preload reduction, fluid response\n  * Distributive: afterload reduction, sepsis pathophysiology (endotoxin → cytokines → NO → vasodilation), warm vs cold distributive\n  * Cardiogenic: pump failure, ECG role (STEMI, new LBBB, dysrhythmia)\n  * Obstructive: tension PTX (absent sounds, JVD, tracheal deviation), massive PE (S1Q3T3, JVD, hypoxia), cardiac tamponade (Beck\'s triad, electrical alternans)\n- Patient reveal: tension PTX. Nick performs finger thoracostomy. BP improves. Then they find fever and productive cough — concurrent septic source.\n- Sepsis at MICA level: fluid targets, vasopressor choice (noradrenaline first line — why), ceftriaxone pre-hospital.\n- Agitated patient CPG A0708.\n- ECG clues: electrical alternans, S1Q3T3, new LBBB, sine wave.\n\nFull transcript. Diagnosis changes three times.'}
+  ],
+  W16:[
+    {id:'ep18',num:'EP 18',title:'The OSCE Patient',dur:'40 min',
+     hook:"The finale. Paul sits the MICA OSCE. Nick is his assessor. Everything from 18 episodes tested in one patient.",
+     tags:['t-cpg','t-ecg','t-pharm','t-path'],tl:['Full OSCE simulation','Clinical leadership','Selection readiness'],
+     prompt:'Deliver a full 30-40 minute podcast episode of "Code Critical" — EP 18: The OSCE Patient. This is the series finale.\n\nHOSTS: Nick McDonald (assessor) and Paul Rogers (MICA OSCE candidate). EXPERT: Michael Walker (emergency physician, post-OSCE debrief).\n\nTHE CASE: 58yo male, dispatched "chest pain and confusion." On arrival: GCS 12, BP 83/52, HR 142, SpO2 90%, diaphoretic. ECG: rapid AF with rate-related LBBB. History: COPD, heart failure, warfarin, previous STEMI, febrile 3 days, productive cough. Deliberately ambiguous: sepsis driving AF driving cardiogenic shock.\n\nPaul leads every decision. Nick tests him:\n- CPG A0101: scene leadership, primary survey, delegated roles\n- ECG: is this new LBBB (STEMI equivalent)? Sgarbossa criteria\n- 250mL fluid — Nick challenges: what if cardiogenic?\n- Ceftriaxone: indication, dose, rationale\n- Vasopressor: BP unchanged — noradrenaline vs adrenaline — Michael asks why\n- Airway: SpO2 86%, GCS 9 falling — RSI vs rapid transport\n- ISBAR handover — Nick times it: 90 seconds maximum\n\nMichael\'s debrief: what the OSCE assessed, e-portfolio reflective structure, Saville Wave leadership qualities. Michael asks Paul: why do you want to be a MICA paramedic? Paul\'s answer closes the series.\n\nFull transcript. Paul makes one decision he would not have made in Episode 1. Nick acknowledges it. The character arc of the series lands here.'}
+  ]
+};
+
+var TOPICS = [
+  {id:'ca',label:'Cardiac Arrest'},{id:'acs',label:'ACS & STEMI'},
+  {id:'dysr',label:'Dysrhythmias'},{id:'rsi',label:'RSI'},
+  {id:'trauma',label:'Major Trauma'},{id:'mix',label:'Mixed'}
+];
+
+var QB = {
+  ca:[
+    {q:"Per CPG A0201, what energy for each biphasic defibrillation attempt in VF?",opts:["100 J","150 J","200 J","360 J"],c:2,expl:"CPG A0201 specifies 200J biphasic for all VF/pVT defibrillation attempts. Biphasic waveforms are more efficient and energy stays constant — no escalation.",ref:"CPG A0201",dt:"t-cpg"},
+    {q:"Adrenaline 1mg IV in arrest — frequency per CPG A0201?",opts:["Every 2 min","Every 4 min (every 2 cycles)","Every 5 min","After each shock"],c:1,expl:"Adrenaline 1mg IV/IO every 4 minutes (every second CPR cycle). Balances alpha-1 vasoconstriction (increases coronary perfusion pressure) against risk of myocardial catecholamine toxicity.",ref:"CPG A0201",dt:"t-pharm"},
+    {q:"Post-ROSC SpO2 target per CPG A0202. Why is 100% harmful?",opts:["88–92%","94–98%","99–100%","100% always"],c:1,expl:"Target SpO2 94–98%. Hyperoxia generates reactive oxygen species worsening reperfusion injury in ischaemic brain tissue. Free radical generation in ischaemia-reperfusion is an active harm — normoxia is the target.",ref:"CPG A0202",dt:"t-path"},
+    {q:"Which is NOT one of the 4H reversible causes of cardiac arrest?",opts:["Hypoxia","Hypothyroidism","Hypovolaemia","Hypothermia"],c:1,expl:"The 4Hs: Hypoxia, Hypovolaemia, Hyper/hypokalaemia, Hypothermia. Hypothyroidism is a chronic condition — not a rapidly reversible arrest cause.",ref:"CPG A0201",dt:"t-path"},
+    {q:"30 min of high-quality ALS, asystole on two leads, no reversible causes. CPG A0203?",opts:["Continue until physician pronounces death","Cessation appropriate — document fully","Contact Medical Advisor before every decision","Transport all patients"],c:1,expl:"CPG A0203 allows ceasing resuscitation without Medical Advisor contact in most circumstances. After 30 min well-conducted ALS with no ROSC and no reversible causes, cessation is clinically and ethically appropriate.",ref:"CPG A0203",dt:"t-cpg"},
+    {q:"Amiodarone dose for shock-refractory VF after 3rd defibrillation?",opts:["150mg IV","300mg IV","5mg/kg IV","600mg IV"],c:1,expl:"Amiodarone 300mg IV after the 3rd shock. Second dose 150mg for recurrent VF. Multi-channel blocker (Na, K, Ca channels plus beta) — slows conduction, reduces defibrillation threshold.",ref:"CPG A0201",dt:"t-pharm"},
+    {q:"Calcium gluconate in hyperkalaemic arrest — mechanism?",opts:["Lowers K+ by shifting intracellularly","Raises myocardial threshold potential — membrane stabilisation","Reverses K+ toxicity at the AV node","Activates Na/K-ATPase"],c:1,expl:"Calcium gluconate does NOT lower K+. It raises the myocardial threshold potential (membrane stabilisation), protecting against fatal arrhythmia. Subsequent treatments shift K+ intracellularly.",ref:"Pharmacology",dt:"t-pharm"},
+    {q:"CPG A0101 identifies which cognitive error as a patient safety risk?",opts:["Confirmation bias during history","Early diagnostic closure based on dispatch information","Fixation error during CPR","Framing effect from prior history"],c:1,expl:"CPG A0101 explicitly warns against early diagnostic closure based on dispatch information. Both attendants should independently assess.",ref:"CPG A0101",dt:"t-cpg"},
+    {q:"ETCO2 rises from 8mmHg to 38mmHg during CPR. What does this indicate?",opts:["Oesophageal intubation — remove tube","ROSC — restored cardiac output delivering CO2 to lungs","Hyperventilation causing CO2 retention","Metabolic alkalosis"],c:1,expl:"Sudden ETCO2 rise to near-normal values = ROSC. Restored cardiac output delivers CO2 to lungs for exhalation. Confirm with pulse check before stopping compressions.",ref:"CPG A0202",dt:"t-path"},
+    {q:"PEA after TCA OD. QRS 180ms, large R wave aVR. First-line treatment?",opts:["Adrenaline only","Sodium bicarbonate 1-2 mmol/kg IV","Naloxone 2mg IV","Calcium gluconate"],c:1,expl:"TCA causes sodium channel blockade — wide QRS >120ms and R wave ≥3mm in aVR are the signature. Sodium bicarbonate increases extracellular Na+ and raises pH, reversing blockade. Amiodarone CONTRAINDICATED — also a sodium channel blocker.",ref:"CPG A0707",dt:"t-pharm"}
+  ],
+  acs:[
+    {q:"Inferior STEMI: ST elevation II, III, aVF. Where are reciprocal changes?",opts:["V1–V4 only","I and aVL — and sometimes V1–V4","V5–V6 only","No reciprocal changes"],c:1,expl:"Inferior STEMI produces reciprocal ST depression in I and aVL (directly opposite the inferior wall). ST depression in V1-V4 may represent posterior extension.",ref:"ECG",dt:"t-ecg"},
+    {q:"GTN absolute contraindications in ACS?",opts:["HR > 100 bpm","SBP < 90mmHg or suspected RV MI","Age > 80 years","First episode of chest pain"],c:1,expl:"GTN contraindicated: SBP <90mmHg and RV MI (preload-dependent RV — venodilation precipitates collapse). Also within 24-48hr of PDE-5 inhibitors.",ref:"ACS CPG",dt:"t-pharm"},
+    {q:"Mechanism of aspirin in ACS?",opts:["Inhibits thrombin preventing fibrin polymerisation","Irreversibly acetylates COX-1, blocking thromboxane A2 and platelet aggregation","Blocks ADP receptors P2Y12","Activates tPA lysing clot"],c:1,expl:"Aspirin irreversibly inhibits COX-1, blocking TXA2 production. TXA2 is a potent platelet activator and vasoconstrictor. Effect irreversible for platelet lifespan (~10 days). Hence 300mg loading dose.",ref:"ACS CPG",dt:"t-pharm"},
+    {q:"Wellens syndrome Type B T waves in V2-V3 indicate?",opts:["RCA occlusion","Critical proximal LAD stenosis — pain-free, imminent massive anterior MI","Circumflex stenosis","Triple vessel disease"],c:1,expl:"Wellens Type B (deep symmetric T inversions V2-V3) = critical proximal LAD stenosis in pain-free period. Never stress test. Requires urgent invasive strategy.",ref:"ECG",dt:"t-ecg"},
+    {q:"de Winter T waves pattern?",opts:["Deep symmetric T inversions V1-V6","Upsloping ST depression at J-point with tall peaked T waves V1-V6","Diffuse ST elevation all leads","Peaked T waves inferior leads only"],c:1,expl:"de Winter: upsloping ST depression ≥1mm at J-point + tall symmetrically peaked T waves V1-V6 = proximal LAD occlusion. STEMI equivalent — same cath lab pathway.",ref:"ECG",dt:"t-ecg"},
+    {q:"Posterior MI reciprocal changes in V1-V4?",opts:["ST elevation and Q waves","Tall R waves, horizontal ST depression and tall upright T waves","Diffuse ST elevation","Deep T inversions only"],c:1,expl:"Posterior STEMI: tall R waves (mirror of Q waves), horizontal ST depression (mirror of ST elevation), tall upright T waves in V1-V4. Confirm with V7-V9.",ref:"ECG",dt:"t-ecg"},
+    {q:"Inferior STEMI, GTN given, BP drops to 64/38. Most likely explanation?",opts:["Pulmonary oedema from LV involvement","RV MI — GTN reduced preload in a preload-dependent RV","Vasovagal response","Aortic dissection"],c:1,expl:"RV MI complicates inferior STEMI. RV is preload-dependent — GTN precipitates collapse. Cease GTN, IV fluid bolus 250-500mL, supine position.",ref:"ACS CPG",dt:"t-path"},
+    {q:"Mechanism of ST elevation in STEMI at cellular level?",opts:["Ventricular hypertrophy changes repolarisation","Injury current from voltage gradient between ischaemic and normal myocardium","Sympathetic catecholamine excess","Coronary vasospasm directly generating current"],c:1,expl:"STEMI ST elevation = injury current. Ischaemic myocytes cannot maintain resting membrane potential — partially depolarised at rest. Voltage gradient between ischaemic and normal myocardium manifests as ST elevation in overlying leads.",ref:"Pathophysiology",dt:"t-path"},
+    {q:"Mechanism of heparin in ACS?",opts:["Directly dissolves coronary thrombus","Binds antithrombin III, accelerating inhibition of thrombin and factor Xa","Inhibits platelet aggregation via GPIIb/IIIa","Blocks vitamin K-dependent clotting factors"],c:1,expl:"Heparin binds AT-III, accelerating inhibition of thrombin (IIa) and factor Xa. Prevents thrombus propagation — does not dissolve established clot.",ref:"ACS CPG",dt:"t-pharm"},
+    {q:"Strongest Sgarbossa criterion for acute MI in LBBB?",opts:["Any LBBB with chest pain","Concordant ST elevation ≥1mm in a lead with positive QRS","Discordant ST depression >1mm in V1-V3","Previously unseen new LBBB"],c:1,expl:"Concordant ST elevation (ST and QRS same direction) should NEVER occur in LBBB — definitively indicates acute injury. Any Sgarbossa-positive LBBB warrants cath lab activation.",ref:"ECG",dt:"t-ecg"}
+  ],
+  dysr:[
+    {q:"Regular narrow complex tachycardia 185bpm, no P waves. Most likely diagnosis?",opts:["AF — irregularly irregular","SVT — likely AVNRT re-entrant circuit","Sinus tachycardia","Atrial flutter 2:1 block"],c:1,expl:"Regular narrow complex ~185bpm, no P waves = SVT. AF is irregularly irregular. Atrial flutter at 2:1 runs at ~150bpm.",ref:"Dysrhythmia CPG",dt:"t-ecg"},
+    {q:"Mechanism of adenosine in terminating SVT?",opts:["Blocks sodium channels","Activates A1 receptors, opening K+ channels — hyperpolarises AV node, interrupts re-entrant circuit","Directly cardioverts via transient asystole","Increases vagal tone via SA node"],c:1,expl:"Adenosine activates A1 receptors → K+ channels (IK-Ado) → hyperpolarises AV node → transient block interrupting the re-entrant circuit. Half-life ~10 seconds. Fast push into proximal vein is critical.",ref:"Dysrhythmia CPG",dt:"t-pharm"},
+    {q:"AF, haemodynamically unstable (BP 70/40, GCS reduced). Immediate management?",opts:["Adenosine 6mg IV","Amiodarone 300mg IV over 20 min","Synchronised DC cardioversion","Metoprolol 5mg IV"],c:2,expl:"Haemodynamically unstable AF = immediate synchronised DC cardioversion. Synchronisation critical — unsynchronised shock risks R-on-T triggering VF.",ref:"Dysrhythmia CPG",dt:"t-cpg"},
+    {q:"Which ECG features most strongly confirm VT over SVT with aberrancy?",opts:["Rate >200bpm","AV dissociation, fusion beats or capture beats","QRS width >140ms","Negative concordance in precordial leads only"],c:1,expl:"AV dissociation, fusion beats, and capture beats are pathognomonic of VT. When in doubt treat wide complex tachycardia as VT.",ref:"ECG",dt:"t-ecg"},
+    {q:"Torsades de pointes — mechanism of magnesium sulphate treatment?",opts:["Restores sinus rhythm in AF","Polymorphic VT with long QT — Mg blocks calcium channels suppressing early after-depolarisations","Monomorphic VT — membrane stabilisation","Digoxin toxicity — reverses binding"],c:1,expl:"Torsades = polymorphic VT with QT prolongation. MgSO4 2g IV blocks calcium channels, shortens action potential, suppresses EADs. Amiodarone CONTRAINDICATED — further prolongs QT.",ref:"Dysrhythmia CPG",dt:"t-pharm"}
+  ],
+  rsi:[
+    {q:"Critical contraindication to suxamethonium before RSI?",opts:["Age > 65 years","Hyperkalaemia, burns >24hr, rhabdomyolysis, prolonged immobility or denervation","Known allergy to local anaesthetics","Elevated ICP"],c:1,expl:"Suxamethonium causes transient K+ rise ~0.5-1.0 mEq/L. In conditions with upregulated extrajunctional ACh receptors (burns >24hr, rhabdomyolysis, denervation, prolonged immobility) this rise can be fatal. Use rocuronium 1.2mg/kg.",ref:"CPG A0302",dt:"t-pharm"},
+    {q:"Mechanism of ketamine as RSI induction agent?",opts:["GABA-A agonist — sedation and amnesia","NMDA receptor antagonist — dissociative anaesthesia with preserved airway reflexes, analgesia and bronchodilation","Mu-opioid agonist","Alpha-2 agonist"],c:1,expl:"Ketamine is an NMDA receptor antagonist producing dissociative anaesthesia. Advantages: preserves airway reflexes/respiratory drive, intrinsic analgesia, bronchodilation, maintains haemodynamics.",ref:"CPG A0302",dt:"t-pharm"},
+    {q:"Target ETCO2 post-intubation WITHOUT TBI?",opts:["25–30 mmHg","35–45 mmHg","50–60 mmHg","<20 mmHg"],c:1,expl:"Normal post-intubation target: ETCO2 35-45mmHg (normocapnia). In TBI, target 35-40mmHg. Routine hyperventilation reduces CBF — only a brief bridge for active herniation.",ref:"CPG A0302",dt:"t-cpg"},
+    {q:"Rocuronium 1.2mg/kg used. Reversal agent and mechanism?",opts:["Neostigmine — anticholinesterase","Sugammadex — gamma-cyclodextrin encapsulating rocuronium, removing it from the NMJ","Flumazenil — reverses sedation","Naloxone — partial reversal"],c:1,expl:"Sugammadex forms a tight inclusion complex with rocuronium in plasma, drawing drug away from the NMJ. Reversal dose for 1.2mg/kg: 16mg/kg sugammadex.",ref:"CPG A0302",dt:"t-pharm"},
+    {q:"Post-intubation ETCO2 waveform disappears, SpO2 falling, tube at 22cm. First action?",opts:["Remove tube immediately","Direct laryngoscopy to visually confirm tube at the cords","Increase ventilation rate","Change ETCO2 circuit"],c:1,expl:"Loss of ETCO2 after confirmed intubation = tube displacement until proven otherwise. Direct laryngoscopy confirms position. Do not remove a correctly placed tube based on ETCO2 loss alone.",ref:"CPG A0302",dt:"t-cpg"}
+  ],
+  trauma:[
+    {q:"Target SBP for permissive hypotension in penetrating abdominal trauma WITHOUT TBI?",opts:["Normalise to >120 mmHg","80–90 mmHg","50–60 mmHg","100–110 mmHg"],c:1,expl:"Permissive hypotension targets SBP 80-90mmHg. Aggressive crystalloid dislodges clots, dilutes clotting factors, worsens lethal triad. In TBI, higher MAP needed for cerebral perfusion pressure.",ref:"CPG A0801",dt:"t-cpg"},
+    {q:"TXA critical time window for maximum mortality benefit?",opts:["Within 30 minutes","Within 3 hours — greatest benefit within 1 hour; after 3hr may increase mortality","Within 6 hours","Within 12 hours"],c:1,expl:"CRASH-2: TXA within 3 hours reduces mortality; greatest benefit within 1 hour. After 3 hours may increase mortality. AV dose: 1g IV over 10 min.",ref:"CPG A0801",dt:"t-pharm"},
+    {q:"Why is finger thoracostomy preferred over needle decompression in the intubated patient?",opts:["Needles unavailable in MICA kits","Needles frequently fail in large patients — finger thoracostomy is definitively reliable","Needle decompression takes too long","Finger thoracostomy is quieter"],c:1,expl:"Needle decompression fails to reach pleural space in up to 50% of patients and can kink. Finger thoracostomy — blunt dissection 4th/5th ICS anterior axillary line — definitively opens the pleural space.",ref:"CPG A0802",dt:"t-cpg"},
+    {q:"TBI patient, GCS 6, blown right pupil. Ventilation target?",opts:["ETCO2 <25 — aggressive hyperventilation","ETCO2 35–40 default; brief 30–35 only for active herniation signs","ETCO2 50–55 — permissive hypercapnia","Rate 20/min regardless"],c:1,expl:"Normocapnia ETCO2 35-40 is the default in TBI. Routine hyperventilation reduces CBF — worsening ischaemia. Brief ETCO2 30-35 only during active herniation. CPG A0803.",ref:"CPG A0803",dt:"t-path"},
+    {q:"Class III haemorrhagic shock clinical picture?",opts:["HR <100, normal BP, normal mentation","HR 120–140, BP reduced SBP 70-90, RR 30-40, confused","HR >140, critically low BP, unconscious","HR 100–120, near-normal BP, mild anxiety"],c:1,expl:"Class III shock = 30-40% blood volume loss. Compensatory mechanisms failing: HR 120-140, BP significantly reduced, RR 30-40, confusion from cerebral hypoperfusion.",ref:"CPG A0801",dt:"t-path"}
+  ],
+  mix:[
+    {q:"Dialysis patient, peaked T waves, HR 38, widening QRS, K+ 7.9. First MICA drug?",opts:["Sodium bicarbonate","Calcium gluconate 10mL 10% IV — membrane stabilisation","Salbutamol nebulised","Insulin/dextrose"],c:1,expl:"Calcium gluconate is the immediate priority with ECG changes — membrane stabilisation raises threshold potential, protects against fatal arrhythmia. Does NOT lower K+.",ref:"MICA pharmacology",dt:"t-pharm"},
+    {q:"36 weeks pregnant, seizing, BP 196/122. First drug?",opts:["Diazepam 10mg IV","MgSO4 4g IV over 5–10 min — eclampsia","Labetalol IV","RSI and transport"],c:1,expl:"Seizure + hypertension + pregnancy = eclampsia. MgSO4: NMDA receptor blockade AND cerebral vasodilation. Loading 4g IV over 5-10 min. Toxicity: patellar reflexes lost first. Antidote: calcium gluconate.",ref:"Obstetric CPG",dt:"t-pharm"},
+    {q:"S1Q3T3 pattern, sudden dyspnoea, pleuritic pain, SpO2 86%, BP 88/60. Management?",opts:["Inferior STEMI — aspirin, heparin, cath lab","Massive PE — supportive O2, cautious fluid, urgent transport","Pericarditis — analgesia and transport","Anterior STEMI with aberrancy"],c:1,expl:"S1Q3T3 + sinus tachycardia + hypoxia + pleuritic dyspnoea + haemodynamic compromise = massive PE. Supportive O2, cautious fluid (strained RV), urgent transport. Avoid GTN — collapses preload.",ref:"ECG/CPG",dt:"t-ecg"},
+    {q:"Cardiogenic shock post-STEMI, BP 70/45. Why is noradrenaline preferred over adrenaline first-line?",opts:["Noradrenaline has stronger beta-1 inotropy","Predominantly alpha-1 with moderate beta-1 — raises SVR without excessive tachycardia or arrhythmia","Adrenaline contraindicated in all shock","Noradrenaline reduces pain"],c:1,expl:"Noradrenaline's predominantly alpha-1 activity increases SVR and MAP without the marked tachycardia and arrhythmogenicity of full beta agonism. Excessive tachycardia in stunned post-MI myocardium worsens ischaemia.",ref:"Vasopressor pharmacology",dt:"t-pharm"},
+    {q:"2-year-old, 12kg, cardiac arrest. Correct adrenaline dose?",opts:["1mg IV — adult dose","0.12mg (0.01mg/kg) IV/IO","0.5mg IV — half adult","5mcg/kg IV"],c:1,expl:"Paediatric adrenaline: 0.01mg/kg IV/IO. For 12kg: 0.12mg = 1.2mL of 1:10,000 solution. Adult doses cause organ toxicity and fatal arrhythmias in children.",ref:"Paediatric CPG",dt:"t-pharm"},
+    {q:"Organophosphate poisoning — SLUDGE, miosis, bradycardia. First treatment?",opts:["Muscarinic agonism — atropine blocks excess ACh","AChE inhibition → ACh accumulation → atropine titrated to DRY secretions (not HR)","Pralidoxime first line","Naloxone reverses it"],c:1,expl:"Organophosphates inhibit AChE → ACh accumulates. Atropine blocks muscarinic receptors — titrate to dry secretions, NOT heart rate. Pralidoxime reactivates AChE before irreversible ageing.",ref:"CPG A0709",dt:"t-path"},
+    {q:"Severe asthma fails salbutamol and ipratropium. Mechanism of IV MgSO4?",opts:["Direct beta-2 agonism","Calcium antagonism — inhibits calcium-mediated bronchial smooth muscle contraction and mast cell degranulation","Suppresses eosinophilic inflammation","Blocks muscarinic receptors"],c:1,expl:"MgSO4 is a physiological calcium antagonist — Mg2+ competes with calcium causing bronchial smooth muscle relaxation and inhibiting mast cell degranulation. Dose: 2.5g IV over 20 min.",ref:"CPG A0601",dt:"t-pharm"},
+    {q:"Complete heart block HR 30, BP 72/40. Atropine 600mcg — no response. Why?",opts:["Atropine dose too low","Infranodal block (wide QRS escape) — below AV node where vagal tone has no effect; transcutaneous pacing required","Atropine only works in AF","Patient needs amiodarone"],c:1,expl:"Atropine only works in nodal (high) blocks with junctional escape (narrow QRS). In infranodal complete heart block the problem is below the Bundle of His where parasympathetic input has no influence. Transcutaneous pacing required.",ref:"Dysrhythmia CPG",dt:"t-ecg"},
+    {q:"14yo, progressive stridor 2hr, drooling, high fever, toxic, won't lie flat. Most dangerous error?",opts:["Treating as croup then examining throat","Epiglottitis — examining the throat or agitating can precipitate complete obstruction and death","Foreign body — perform abdominal thrusts","Anaphylaxis — give adrenaline IM"],c:1,expl:"Drooling + tripod + high fever + toxic = epiglottitis. Examining the throat can trigger immediate laryngospasm and complete obstruction. Gentle transport, position of comfort, controlled environment intubation with full backup.",ref:"Paediatric airway CPG",dt:"t-path"},
+    {q:"Post-ROSC, wide complex bradycardia 28bpm, QRS 180ms, large R wave aVR after TCA OD. Treatment?",opts:["Atropine 600mcg IV","Sodium bicarbonate 1-2 mmol/kg IV — reverses TCA sodium channel blockade","Amiodarone 150mg IV","Transcutaneous pacing"],c:1,expl:"TCA: QRS >120ms and R wave ≥3mm in aVR = sodium channel blockade. Sodium bicarbonate increases extracellular Na+ and raises pH — both reverse blockade. Amiodarone CONTRAINDICATED — also a sodium channel blocker.",ref:"CPG A0707",dt:"t-pharm"}
+  ]
+};
+
+// ─────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────
+
+var S = {
+  apiKey: localStorage.getItem('cc_api') || '',
+  sbUrl: localStorage.getItem('cc_sb_url') || 'https://wgcqzamuspuqpedqasbc.supabase.co',
+  sbKey: localStorage.getItem('cc_sb_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnY3F6YW11c3B1cXBlZHFhc2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDYyNTcsImV4cCI6MjA5MTA4MjI1N30.d7Qwcc0N-FM5rlP6zmMdSjAovC-lQmdOi8-N_CZMoxw',
+  userId: localStorage.getItem('cc_uid') || ('user_' + Math.random().toString(36).slice(2, 10)),
+  week: 'W1',
+  qTopic: 'ca',
+  qIdx: 0,
+  qAnswered: false,
+  qCorrect: 0,
+  currentQ: [],
+  history: JSON.parse(localStorage.getItem('cc_hist') || '{}'),
+  weak: JSON.parse(localStorage.getItem('cc_weak') || '{}'),
+  allC: parseInt(localStorage.getItem('cc_allC') || '0'),
+  allT: parseInt(localStorage.getItem('cc_allT') || '0'),
+  epCount: parseInt(localStorage.getItem('cc_eps') || '0'),
+  chunks: [], chunkIdx: 0, charPos: 0, totalChars: 0,
+  playing: false, paused: false, speechRate: 1.0,
+  generating: false, currentEp: ''
+};
+
+if (!localStorage.getItem('cc_uid')) localStorage.setItem('cc_uid', S.userId);
+
+function saveLocal() {
+  localStorage.setItem('cc_hist', JSON.stringify(S.history));
+  localStorage.setItem('cc_weak', JSON.stringify(S.weak));
+  localStorage.setItem('cc_allC', S.allC);
+  localStorage.setItem('cc_allT', S.allT);
+  localStorage.setItem('cc_eps', S.epCount);
+}
+
+// ─────────────────────────────────────────────────────────────
+// SUPABASE
+// ─────────────────────────────────────────────────────────────
+
+async function sbFetch(path, method, body) {
+  if (!S.sbUrl || !S.sbKey) return null;
+  try {
+    var r = await fetch(S.sbUrl + '/rest/v1/' + path, {
+      method: method || 'GET',
+      headers: {
+        'apikey': S.sbKey,
+        'Authorization': 'Bearer ' + S.sbKey,
+        'Content-Type': 'application/json',
+        'Prefer': method === 'POST' ? 'resolution=merge-duplicates' : ''
+      },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (!r.ok) return null;
+    var txt = await r.text();
+    return txt ? JSON.parse(txt) : null;
+  } catch (e) { return null; }
+}
+
+async function syncToSupabase() {
+  if (!S.sbUrl || !S.sbKey) return;
+  var payload = {
+    user_id: S.userId,
+    history: S.history,
+    weak: S.weak,
+    all_correct: S.allC,
+    all_total: S.allT,
+    ep_count: S.epCount,
+    updated_at: new Date().toISOString()
+  };
+  await sbFetch('mica_progress?on_conflict=user_id', 'POST', payload);
+}
+
+async function syncFromSupabase() {
+  if (!S.sbUrl || !S.sbKey) return;
+  var data = await sbFetch('mica_progress?user_id=eq.' + S.userId + '&select=*');
+  if (data && data.length > 0) {
+    var row = data[0];
+    S.history = row.history || S.history;
+    S.weak = row.weak || S.weak;
+    S.allC = row.all_correct || S.allC;
+    S.allT = row.all_total || S.allT;
+    S.epCount = row.ep_count || S.epCount;
+    saveLocal();
+    toast('Progress synced from cloud');
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// UI HELPERS
+// ─────────────────────────────────────────────────────────────
+
+function showScreen(name, btn) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('screen-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'progress') renderProgress();
+}
+
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 2500);
+}
+
+function updateDots() {
+  document.getElementById('api-dot').className = 'status-dot' + (S.apiKey ? ' on' : '');
+  document.getElementById('api-lbl').textContent = S.apiKey ? 'API ✓' : 'API';
+  document.getElementById('sb-dot').className = 'status-dot' + (S.sbUrl && S.sbKey ? ' on' : '');
+  document.getElementById('sb-lbl').textContent = (S.sbUrl && S.sbKey) ? 'SYNC ✓' : 'SYNC';
+}
+
+// ─────────────────────────────────────────────────────────────
+// SETTINGS MODAL
+// ─────────────────────────────────────────────────────────────
+
+function openSettings(tab) {
+  var html = '<div class="modal-ttl">Settings</div>'
+    + '<div class="modal-sub">Your keys are stored only on this device and sent only to their respective services.</div>'
+    + '<div class="modal-section">'
+    + '<div style="font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;margin-bottom:8px">ANTHROPIC API KEY</div>'
+    + '<input id="inp-api" type="password" placeholder="sk-ant-api03-..." autocomplete="off">'
+    + '</div>'
+    + '<div class="modal-section">'
+    + '<div style="font-family:var(--mono);font-size:10px;color:var(--accent2);letter-spacing:0.1em;margin-bottom:8px">SUPABASE — PROGRESS SYNC</div>'
+    + '<input id="inp-sburl" type="text" placeholder="https://xxxx.supabase.co" autocomplete="off">'
+    + '<input id="inp-sbkey" type="password" placeholder="anon public key" autocomplete="off">'
+    + '</div>'
+    + '<div class="modal-btns"><button onclick="closeModal()">CANCEL</button><button class="save" onclick="saveSettings()">SAVE</button></div>'
+    + '<div class="modal-note">API key: console.anthropic.com → API Keys<br>Supabase: your project → Settings → API<br>Each episode costs ~$0.05–0.15 in API credits.</div>';
+
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal').classList.add('open');
+
+  setTimeout(function() {
+    if (S.apiKey) document.getElementById('inp-api').value = '••••••••••••••••';
+    document.getElementById('inp-sburl').value = S.sbUrl || 'https://wgcqzamuspuqpedqasbc.supabase.co';
+    if (S.sbKey) document.getElementById('inp-sbkey').value = '••••••••••••••••';
+  }, 50);
+}
+
+function saveSettings() {
+  var api = document.getElementById('inp-api').value.trim();
+  var sburl = document.getElementById('inp-sburl').value.trim();
+  var sbkey = document.getElementById('inp-sbkey').value.trim();
+
+  if (api && api !== '••••••••••••••••') { S.apiKey = api; localStorage.setItem('cc_api', api); }
+  if (sburl) { S.sbUrl = sburl.replace(/\/$/, ''); localStorage.setItem('cc_sb_url', S.sbUrl); }
+  if (sbkey && sbkey !== '••••••••••••••••') { S.sbKey = sbkey; localStorage.setItem('cc_sb_key', sbkey); }
+
+  updateDots();
+  closeModal();
+  toast('Settings saved');
+
+  if (S.sbUrl && S.sbKey) {
+    syncFromSupabase().then(function() {
+      createTableIfNeeded();
+    });
+  }
+}
+
+async function createTableIfNeeded() {
+  // The table needs to be created in Supabase dashboard
+  // This just attempts a read to see if it exists
+  var data = await sbFetch('mica_progress?user_id=eq.' + S.userId + '&select=user_id');
+  if (data === null) {
+    toast('Create mica_progress table in Supabase — see README');
+  }
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function closeModalBg(e) { if (e.target === document.getElementById('modal')) closeModal(); }
+
+// ─────────────────────────────────────────────────────────────
+// PODCAST
+// ─────────────────────────────────────────────────────────────
+
+function buildWeekScroll() {
+  document.getElementById('week-scroll').innerHTML = WEEKS.map(function(w) {
+    return '<button class="chip' + (w.n === 'W1' ? ' active' : '') + '" onclick="selectWeek(\'' + w.n + '\',this)">' + w.n + ' ' + w.label + '</button>';
+  }).join('');
+}
+
+function selectWeek(wk, el) {
+  S.week = wk;
+  document.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('active'); });
+  el.classList.add('active');
+  renderEps();
+}
+
+function renderEps() {
+  var eps = EPISODES[S.week];
+  if (!eps || !eps.length) {
+    document.getElementById('ep-list').innerHTML = '<div class="empty"><div class="empty-icon">🎙</div><div class="empty-text">Episodes for this week coming soon.<br>Start with Week 1.</div></div>';
+    return;
+  }
+  document.getElementById('ep-list').innerHTML = eps.map(function(ep) {
+    var tags = ep.tags.map(function(c, i) { return '<span class="tag ' + c + '">' + ep.tl[i] + '</span>'; }).join('');
+    return '<div class="ep-card">'
+      + '<div class="ep-top"><span class="ep-num">' + ep.num + '</span><span class="ep-dur">' + ep.dur + '</span></div>'
+      + '<div class="ep-title">' + ep.title + '</div>'
+      + '<div class="ep-hook">' + ep.hook + '</div>'
+      + '<div class="cast"><span class="cp host">Nick McDonald</span><span class="cp host">Paul Rogers</span><span class="cp expert">Michael Walker</span></div>'
+      + '<div class="ep-tags">' + tags + '</div>'
+      + '<div class="play-row"><button class="play-btn" onclick="playEp(\'' + ep.id + '\')">'
+      + '<span class="tri"></span>&nbsp;PLAY — ' + ep.dur + ' DEEP DIVE</button></div>'
+      + '</div>';
+  }).join('');
+}
+
+function findEp(id) {
+  for (var w in EPISODES) {
+    var found = EPISODES[w].find(function(e) { return e.id === id; });
+    if (found) return found;
+  }
+  return null;
+}
+
+async function playEp(id) {
+  var ep = findEp(id);
+  if (!ep) return;
+  if (!S.apiKey) { openSettings(); return; }
+
+  stopSpeech();
+  S.currentEp = ep.title;
+  S.epCount++;
+  saveLocal();
+  syncToSupabase();
+
+  document.getElementById('p-title').textContent = ep.title;
+  document.getElementById('p-ep').textContent = ep.num + ' · Code Critical';
+  document.getElementById('p-fill').style.width = '0%';
+  document.getElementById('p-gen').style.display = 'block';
+  document.getElementById('p-gen').textContent = 'GENERATING EPISODE...';
+  document.getElementById('player').classList.add('visible');
+  S.generating = true;
+
+  try {
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': S.apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 8000,
+        messages: [{ role: 'user', content: ep.prompt }]
+      })
+    });
+
+    if (!resp.ok) {
+      var err = await resp.json();
+      throw new Error((err.error && err.error.message) || 'API error ' + resp.status);
+    }
+
+    var data = await resp.json();
+    var text = data.content.map(function(b) { return b.text || ''; }).join('');
+    text = text.replace(/\*\*/g, '').replace(/\*/g, '').replace(/#{1,6}\s/g, '').replace(/\[([^\]]*)\]/g, '$1');
+
+    document.getElementById('p-gen').style.display = 'none';
+    S.generating = false;
+    startSpeech(text);
+
+  } catch (e) {
+    document.getElementById('p-gen').textContent = 'ERROR: ' + e.message;
+    S.generating = false;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// SPEECH
+// ─────────────────────────────────────────────────────────────
+
+function chunkText(text) {
+  var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  var chunks = [], cur = '';
+  sentences.forEach(function(s) {
+    if ((cur + s).length > 220) { if (cur) chunks.push(cur.trim()); cur = s; }
+    else cur += s;
+  });
+  if (cur.trim()) chunks.push(cur.trim());
+  return chunks;
+}
+
+function startSpeech(text) {
+  S.chunks = chunkText(text);
+  S.chunkIdx = 0;
+  S.charPos = 0;
+  S.totalChars = text.length;
+  S.playing = true;
+  S.paused = false;
+  updatePPIcon();
+  speakNext();
+}
+
+function speakNext() {
+  if (!S.playing || S.paused) return;
+  if (S.chunkIdx >= S.chunks.length) {
+    S.playing = false;
+    updatePPIcon();
+    document.getElementById('p-fill').style.width = '100%';
+    return;
+  }
+  var chunk = S.chunks[S.chunkIdx];
+  var utt = new SpeechSynthesisUtterance(chunk);
+  utt.rate = S.speechRate;
+  utt.lang = 'en-AU';
+
+  var voices = speechSynthesis.getVoices();
+  var v = voices.find(function(v) {
+    return v.lang.startsWith('en') && (v.name.includes('Samantha') || v.name.includes('Daniel') || v.name.includes('Karen') || v.name.includes('Alex') || v.name.includes('Moira'));
+  });
+  if (v) utt.voice = v;
+
+  utt.onend = function() {
+    S.charPos += chunk.length;
+    var pct = Math.min(100, Math.round((S.charPos / S.totalChars) * 100));
+    document.getElementById('p-fill').style.width = pct + '%';
+    S.chunkIdx++;
+    speakNext();
+  };
+  utt.onerror = function() { S.chunkIdx++; speakNext(); };
+  speechSynthesis.speak(utt);
+}
+
+function togglePlay() {
+  if (S.generating) return;
+  if (S.playing && !S.paused) {
+    speechSynthesis.cancel();
+    S.paused = true; S.playing = false;
+  } else {
+    S.playing = true; S.paused = false;
+    speakNext();
+  }
+  updatePPIcon();
+}
+
+function stopSpeech() {
+  speechSynthesis.cancel();
+  S.playing = false; S.paused = false;
+  S.chunks = []; S.chunkIdx = 0; S.charPos = 0;
+  updatePPIcon();
+}
+
+function skipFwd() {
+  S.chunkIdx = Math.min(S.chunks.length - 1, S.chunkIdx + 4);
+  if (S.playing) { speechSynthesis.cancel(); speakNext(); }
+}
+
+function skipBack() {
+  S.chunkIdx = Math.max(0, S.chunkIdx - 4);
+  S.charPos = Math.max(0, S.charPos - 880);
+  if (S.playing) { speechSynthesis.cancel(); speakNext(); }
+}
+
+var SPEEDS = [0.8, 1.0, 1.25, 1.5, 1.75], spIdx = 1;
+function changeSpeed() {
+  spIdx = (spIdx + 1) % SPEEDS.length;
+  S.speechRate = SPEEDS[spIdx];
+  document.getElementById('speed-btn').textContent = S.speechRate + '×';
+  if (S.playing) { speechSynthesis.cancel(); speakNext(); }
+}
+
+function updatePPIcon() {
+  document.getElementById('pp-icon').innerHTML = (S.playing && !S.paused)
+    ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'
+    : '<polygon points="5,3 19,12 5,21"/>';
+}
+
+function closePlayer() {
+  stopSpeech();
+  document.getElementById('player').classList.remove('visible');
+  document.getElementById('p-gen').style.display = 'none';
+}
+
+// ─────────────────────────────────────────────────────────────
+// QUIZ
+// ─────────────────────────────────────────────────────────────
+
+function buildTopicScroll() {
+  document.getElementById('topic-scroll').innerHTML = TOPICS.map(function(t, i) {
+    return '<button class="chip' + (i === 0 ? ' active2' : '') + '" onclick="selectTopic(\'' + t.id + '\',this)">' + t.label + '</button>';
+  }).join('');
+}
+
+function selectTopic(id, el) {
+  S.qTopic = id; S.qIdx = 0; S.qAnswered = false; S.qCorrect = 0;
+  document.querySelectorAll('#topic-scroll .chip').forEach(function(c) { c.classList.remove('active2'); });
+  el.classList.add('active2');
+  S.currentQ = [];
+  renderQ();
+}
+
+function renderQ() {
+  if (!S.currentQ.length) {
+    var bank = QB[S.qTopic] || QB.mix;
+    S.currentQ = bank.slice().sort(function() { return Math.random() - 0.5; }).slice(0, 10);
+  }
+  if (S.qIdx >= S.currentQ.length) { renderResults(); return; }
+
+  var q = S.currentQ[S.qIdx];
+  var pct = Math.round((S.qIdx / S.currentQ.length) * 100);
+  var opts = q.opts.map(function(o, i) {
+    return '<button class="q-opt" onclick="ansQ(' + i + ')" id="qo' + i + '">' + o + '</button>';
+  }).join('');
+
+  document.getElementById('quiz-area').innerHTML =
+    '<div class="q-meta"><div class="q-pb"><div class="q-pf" style="width:' + pct + '%"></div></div><span class="q-sc">' + S.qCorrect + '/' + S.qIdx + '</span></div>'
+    + '<div class="q-card"><span class="tag ' + q.dt + ' q-ref">' + q.ref + '</span>'
+    + '<div class="q-text">' + q.q + '</div>'
+    + '<div class="q-opts">' + opts + '</div>'
+    + '<div id="qe" class="q-expl" style="display:none">' + q.expl + '<div class="q-ref-lbl">' + q.ref + '</div></div></div>'
+    + '<button class="next-btn" id="qnb" style="display:none" onclick="nextQ()">NEXT QUESTION →</button>';
+}
+
+function ansQ(i) {
+  if (S.qAnswered) return;
+  S.qAnswered = true;
+  var q = S.currentQ[S.qIdx];
+  document.querySelectorAll('.q-opt').forEach(function(o) { o.disabled = true; });
+  var ok = i === q.c;
+  if (ok) { document.getElementById('qo' + i).classList.add('correct'); S.qCorrect++; S.allC++; }
+  else { document.getElementById('qo' + i).classList.add('wrong'); document.getElementById('qo' + q.c).classList.add('reveal'); }
+  S.allT++;
+  if (!S.weak[q.ref]) S.weak[q.ref] = { c: 0, t: 0 };
+  S.weak[q.ref].t++;
+  if (ok) S.weak[q.ref].c++;
+  document.getElementById('qe').style.display = 'block';
+  document.getElementById('qnb').style.display = 'block';
+  saveLocal();
+}
+
+function nextQ() { S.qIdx++; S.qAnswered = false; renderQ(); }
+
+function renderResults() {
+  var total = S.currentQ.length;
+  var pct = Math.round((S.qCorrect / total) * 100);
+  var msg = pct >= 80
+    ? 'Excellent — MICA standard on this topic. Review the explanations for any misses.'
+    : pct >= 60 ? 'Good foundation. Study the explanations for missed questions and replay the relevant episode.'
+    : 'These are tough concepts. Switch to mixed mode or use the drill function in Progress.';
+
+  var today = new Date().toDateString();
+  if (!S.history[today]) S.history[today] = 0;
+  S.history[today]++;
+  saveLocal();
+  syncToSupabase();
+
+  document.getElementById('quiz-area').innerHTML =
+    '<div class="res-wrap"><div class="res-card">'
+    + '<div style="font-size:11px;font-family:var(--mono);color:var(--text3);letter-spacing:0.1em;margin-bottom:8px">QUIZ COMPLETE</div>'
+    + '<div><span class="res-score">' + S.qCorrect + '</span><span class="res-denom">/' + total + '</span></div>'
+    + '<div class="res-pct">' + pct + '% ACCURACY</div>'
+    + '<div class="res-grid"><div class="rg"><div class="rg-v">' + S.qCorrect + '</div><div class="rg-l">CORRECT</div></div>'
+    + '<div class="rg"><div class="rg-v">' + (total - S.qCorrect) + '</div><div class="rg-l">MISSED</div></div>'
+    + '<div class="rg"><div class="rg-v">' + pct + '%</div><div class="rg-l">SCORE</div></div></div>'
+    + '<div class="res-msg">' + msg + '</div>'
+    + '<div class="res-btns"><button onclick="retakeQuiz()">RETAKE</button>'
+    + '<button class="pri" onclick="switchMixed()">MIXED MODE</button></div>'
+    + '</div></div>';
+}
+
+function retakeQuiz() {
+  S.qIdx = 0; S.qAnswered = false; S.qCorrect = 0; S.currentQ = [];
+  renderQ();
+}
+
+function switchMixed() {
+  S.qTopic = 'mix'; S.qIdx = 0; S.qAnswered = false; S.qCorrect = 0; S.currentQ = [];
+  document.querySelectorAll('#topic-scroll .chip').forEach(function(c, i) {
+    c.className = 'chip' + (i === TOPICS.length - 1 ? ' active2' : '');
+  });
+  renderQ();
+}
+
+// ─────────────────────────────────────────────────────────────
+// PROGRESS
+// ─────────────────────────────────────────────────────────────
+
+function renderProgress() {
+  var today = new Date(), streak = 0;
+  for (var i = 0; i < 30; i++) {
+    var d = new Date(today); d.setDate(d.getDate() - i);
+    if (S.history[d.toDateString()]) streak++;
+    else break;
+  }
+  document.getElementById('p-streak').textContent = streak;
+  document.getElementById('p-quiz').textContent = Object.values(S.history).reduce(function(a, b) { return a + b; }, 0);
+  document.getElementById('p-acc').textContent = S.allT > 0 ? Math.round((S.allC / S.allT) * 100) + '%' : '—';
+  document.getElementById('p-eps').textContent = S.epCount;
+
+  var dots = '';
+  for (var i = 29; i >= 0; i--) {
+    var d = new Date(today); d.setDate(d.getDate() - i);
+    var done = S.history[d.toDateString()];
+    dots += '<div class="dot' + (i === 0 ? ' today' : done ? ' done' : '') + '"></div>';
+  }
+  document.getElementById('dots').innerHTML = dots;
+
+  var we = Object.entries(S.weak)
+    .filter(function(e) { return e[1].t > 0; })
+    .map(function(e) { return { n: e[0], p: Math.round((e[1].c / e[1].t) * 100) }; })
+    .sort(function(a, b) { return a.p - b.p; }).slice(0, 6);
+
+  document.getElementById('weak-list').innerHTML = we.length
+    ? we.map(function(w) {
+        return '<div class="weak-row"><span class="weak-name">' + w.n + '</span>'
+          + '<span class="weak-pct">' + w.p + '%</span>'
+          + '<div class="weak-bar"><div class="weak-fill" style="width:' + Math.max(5, 100 - w.p) + '%"></div></div></div>';
+      }).join('')
+    : '<div style="font-size:12px;color:var(--text3);padding:8px 0">Complete a quiz to see your weak areas</div>';
+
+  var synced = S.sbUrl && S.sbKey;
+  document.getElementById('sync-info').innerHTML = synced
+    ? 'Progress syncing to Supabase · <span>user: ' + S.userId + '</span>'
+    : 'Add Supabase credentials to sync across devices';
+}
+
+async function drillWeak() {
+  var we = Object.entries(S.weak)
+    .filter(function(e) { return e[1].t > 0; })
+    .map(function(e) { return { n: e[0], p: Math.round((e[1].c / e[1].t) * 100) }; })
+    .sort(function(a, b) { return a.p - b.p; }).slice(0, 3);
+
+  if (!we.length) { toast('Complete some quizzes first'); return; }
+  if (!S.apiKey) { openSettings(); return; }
+
+  var topics = we.map(function(w) { return w.n + ' (' + w.p + '%)'; }).join(', ');
+  var prompt = 'I am a paramedic preparing for the MICA selection process at Ambulance Victoria. My weakest quiz areas are: ' + topics + '. Please give me a focused deep-dive teaching session on each topic, using clinical cases from the AV CPGs. Use the Code Critical podcast format — Nick McDonald and Paul Rogers discussing, with Michael Walker as the clinical expert providing depth. For each topic cover: pathophysiology, AV CPG management, and relevant pharmacology including mechanisms. Make it 20-25 minutes of content.';
+
+  stopSpeech();
+  document.getElementById('p-title').textContent = 'Drilling: ' + we[0].n;
+  document.getElementById('p-ep').textContent = 'Weak area targeted session';
+  document.getElementById('p-fill').style.width = '0%';
+  document.getElementById('p-gen').style.display = 'block';
+  document.getElementById('p-gen').textContent = 'GENERATING DRILL SESSION...';
+  document.getElementById('player').classList.add('visible');
+  S.generating = true;
+
+  try {
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': S.apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 6000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    var data = await resp.json();
+    var text = data.content.map(function(b) { return b.text || ''; }).join('');
+    text = text.replace(/\*\*/g, '').replace(/\*/g, '').replace(/#{1,6}\s/g, '');
+    document.getElementById('p-gen').style.display = 'none';
+    S.generating = false;
+    startSpeech(text);
+  } catch (e) {
+    document.getElementById('p-gen').textContent = 'ERROR: ' + e.message;
+    S.generating = false;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(function() {});
+}
+
+updateDots();
+buildWeekScroll();
+renderEps();
+buildTopicScroll();
+renderQ();
+
+if (S.sbUrl && S.sbKey) {
+  syncFromSupabase();
+}
+</script>
+</body>
+</html>
