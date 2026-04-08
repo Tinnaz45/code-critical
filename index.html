@@ -594,13 +594,13 @@ function saveSettings() {
   var sburl = document.getElementById('inp-sburl').value.trim();
   var sbkey = document.getElementById('inp-sbkey').value.trim();
 
-  if (api && api !== '••••••••••••••••') { S.apiKey = api; localStorage.setItem('cc_api', api); }
+  if (api && api.length > 10 && !api.includes('\u2022')) { S.apiKey = api.trim(); localStorage.setItem('cc_api', api.trim()); }
   if (sburl) { S.sbUrl = sburl.replace(/\/$/, ''); localStorage.setItem('cc_sb_url', S.sbUrl); }
   if (sbkey && sbkey !== '••••••••••••••••') { S.sbKey = sbkey; localStorage.setItem('cc_sb_key', sbkey); }
 
   updateDots();
   closeModal();
-  toast('Settings saved');
+  toast('Settings saved — API: ' + (S.apiKey ? 'SET ✓' : 'not set'));
 
   if (S.sbUrl && S.sbKey) {
     syncFromSupabase().then(function() {
@@ -691,7 +691,8 @@ async function playEp(id) {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': S.apiKey,
-        'anthropic-version': '2023-06-01'
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
@@ -714,7 +715,7 @@ async function playEp(id) {
     startSpeech(text);
 
   } catch (e) {
-    document.getElementById('p-gen').textContent = 'ERROR: ' + e.message;
+    document.getElementById('p-gen').textContent = 'ERROR: ' + e.message + ' — check API key in settings';
     S.generating = false;
   }
 }
@@ -995,7 +996,8 @@ async function drillWeak() {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': S.apiKey,
-        'anthropic-version': '2023-06-01'
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
